@@ -47,3 +47,9 @@ Inner Loop:
 - Yaw stabilization
 
 ---
+
+## Technologies Used
+
+- Python
+- NumPy
+- PyBullet
