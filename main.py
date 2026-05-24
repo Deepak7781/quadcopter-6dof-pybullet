@@ -128,6 +128,8 @@ z_des = 10
 phi_des = 0
 theta_des = 0
 psi_des = 0
+x_des = 10
+y_des = 0
 
 # Values for plotting
 x_hist = [x]
@@ -137,7 +139,8 @@ z_hist = [z]
 phi_hist = [phi]
 theta_hist = [theta]
 psi_hist = [psi]
-
+phi_des_hist = [phi_des]
+theta_des_hist = [theta_des]
 # For PID control
 zError_int = 0
 zError_prev = 0
@@ -176,6 +179,13 @@ Kp_psi = 6
 Ki_psi = 0.02
 Kd_psi = 2
 
+# Position Controller Gains
+Kp_x = 0.15
+Kd_x = 0.35
+
+Kp_y = 0.15
+Kd_y = 0.35
+
 xdot = 0 
 ydot = 0
 zdot = 0
@@ -206,7 +216,21 @@ zdot_hist = [zdot]
 zdot_des_hist = [0]
 
 for i in range(1, len(Tsim)):
+    x_e = x_des - x
+    y_e = y_des - y
 
+    ax_des = Kp_x * x_e + Kd_x * (0 - xdot)
+    ay_des = Kp_y * y_e + Kd_y * (0 - ydot)
+
+    # Convert desired acceleration to desired tilt angles
+
+    theta_des = (ax_des * cos(psi) + ay_des * sin(psi)) / g
+
+    phi_des = (ax_des * sin(psi) - ay_des * cos(psi)) / g
+
+    # Limit commanded tilt angle
+    phi_des = np.clip(phi_des, -ANGLE_MAX, ANGLE_MAX)
+    theta_des = np.clip(theta_des, -ANGLE_MAX, ANGLE_MAX)
     phiError_int = phiError_int + phi_e * dt
     thetaError_int = thetaError_int + theta_e * dt
     psiError_int = psiError_int + psi_e * dt
@@ -225,7 +249,7 @@ for i in range(1, len(Tsim)):
     zdot_deriv = -(zdot - zdot_prev) / dt
     zdot_prev = zdot
 
-    u1 = m*g + Kp_zdot*zdot_e + Ki_zdot*zdotError_int + Kd_zdot*zdot_deriv
+    u1 = (m*g + Kp_zdot*zdot_e + Ki_zdot*zdotError_int + Kd_zdot*zdot_deriv) / (cos(phi)*cos(theta))
     u2 = Kp_phi*phi_e + Ki_phi*phiError_int + Kd_phi*phiError_deriv
     u3 = Kp_theta*theta_e + Ki_theta*thetaError_int + Kd_theta*thetaError_deriv
     u4 = Kp_psi*psi_e + Ki_psi*psiError_int + Kd_psi*psiError_deriv
