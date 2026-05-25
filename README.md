@@ -48,8 +48,3 @@ Inner Loop:
 
 ---
 
-## Technologies Used
-
-- Python
-- NumPy
-- PyBullet
