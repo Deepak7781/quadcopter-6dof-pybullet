@@ -128,7 +128,7 @@ z_des = 10
 phi_des = 0
 theta_des = 0
 psi_des = 0
-x_des = 10
+x_des = 20
 y_des = 0
 
 # Values for plotting
